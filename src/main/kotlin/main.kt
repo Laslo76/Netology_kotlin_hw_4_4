@@ -28,6 +28,13 @@ object ChatServices{
     private var currentUser: User? = null
 
 
+    fun clear() {
+        users = emptyList<User>()
+        chats = emptyList<ChatRoom>()
+        messages = emptyList<Message>()
+        currentUser = null
+    }
+
     fun add(parameter: Any): Any {
         when (parameter) {
             is User -> users += parameter
@@ -39,16 +46,6 @@ object ChatServices{
     }
 
 
-    fun get(type: TypeObjects): List<Any> {
-        return when (type) {
-            TypeObjects.User -> users
-            TypeObjects.Chat -> chats
-            TypeObjects.Message -> messages
-        }
-
-    }
-
-
     fun getById(type: TypeObjects, id: Int): Any? {
         return when (type) {
             TypeObjects.User -> users.find { it.id==id }
@@ -57,11 +54,10 @@ object ChatServices{
         }
     }
 
-
     fun connectUser(userId: Int): String {
-        val connectetUser = users.find { it.id == userId }
-        if (connectetUser != null) {
-            currentUser  = connectetUser
+        val connectUser = users.find { it.id == userId }
+        if (connectUser != null) {
+            currentUser  = connectUser
         }
         return "Активный пользователь ${showCurrentUser()}"
     }
@@ -95,7 +91,7 @@ object ChatServices{
             val idChat = it.id
             val name = it.name
             digest += messages.filter { it.chatId == idChat }
-                              .maxByOrNull { it.id }?.let { "${name} - ${it.text}" } ?: "${name} - Сообщений нет"
+                              .maxByOrNull { it.id }?.let { "$name - ${it.text}" } ?: "$name - Сообщений нет"
         }
 
         return digest
@@ -196,13 +192,11 @@ object ChatServices{
                 messages += it.copy(read=true)}
 
         return messages.filter { it.chatId == chatId }.sortedBy { it.id }.takeLast(count)
-
     }
 
     fun showMessages(){
         messages.forEach { println(it) }
     }
-
 }
 
 
